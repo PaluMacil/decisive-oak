@@ -1,5 +1,7 @@
 *.exe
 *.exe~
+decisive-oak
+*.data.json
 
 # data
 *.db
