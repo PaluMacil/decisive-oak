@@ -4,10 +4,10 @@ import (
 	"math"
 )
 
-func gain(entropySet float64, attrValues ...Attribute) float64 {
+func gain(entropySet float64, attrValues ...AttributeValue) float64 {
 	thisGain := entropySet
 	for _, av := range attrValues {
-		thisGain = thisGain - (av.PofAttribute * av.Entropy)
+		thisGain = thisGain - (float64(av.Occurrences) * av.Entropy)
 	}
 
 	return thisGain
