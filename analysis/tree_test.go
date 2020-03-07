@@ -1,7 +1,6 @@
 package analysis
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -28,10 +27,21 @@ func TestRoot_CountNodes(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	n1.Children = []Node{*n2, *n3}
-	n2.Children = []Node{*n4}
-	n3.Children = []Node{*n5, *n6}
-	fmt.Println(1, len(n1.Children), len(n2.Children), len(n3.Children))
+	n2 = &n1.Children[0]
+	n2.parent = n1
+
+	n3 = &n1.Children[1]
+	n3.parent = n1
+
+	n4 = &n2.Children[0]
+	n4.parent = n2
+
+	n5 = &n3.Children[0]
+	n5.parent = n3
+
+	n6 = &n3.Children[1]
+	n6.parent = n3
+
 	os.Exit(m.Run())
 }
 
@@ -41,44 +51,45 @@ var n1 = &Node{
 	Label:       "n1",
 	Terminal:    false,
 	parent:      nil,
+	Children: []Node{
+		{
+			Sample:      Sample{},
+			FilterValue: "",
+			Label:       "n2",
+			Terminal:    false,
+			Children: []Node{
+				{
+					Sample:      Sample{},
+					FilterValue: "",
+					Label:       "n4",
+					Terminal:    true,
+				},
+			},
+		},
+		{
+			Sample:      Sample{},
+			FilterValue: "",
+			Label:       "n3",
+			Terminal:    false,
+			Children: []Node{
+				{
+					Sample:      Sample{},
+					FilterValue: "",
+					Label:       "n5",
+					Terminal:    true,
+				},
+				{
+					Sample:      Sample{},
+					FilterValue: "",
+					Label:       "n6",
+					Terminal:    true,
+				},
+			},
+		},
+	},
 }
-
-var n2 = &Node{
-	Sample:      Sample{},
-	FilterValue: "",
-	Label:       "n2",
-	Terminal:    false,
-	parent:      n1,
-}
-
-var n3 = &Node{
-	Sample:      Sample{},
-	FilterValue: "",
-	Label:       "n3",
-	Terminal:    false,
-	parent:      n1,
-}
-
-var n4 = &Node{
-	Sample:      Sample{},
-	FilterValue: "",
-	Label:       "n4",
-	Terminal:    true,
-	parent:      n2,
-}
-
-var n5 = &Node{
-	Sample:      Sample{},
-	FilterValue: "",
-	Label:       "n5",
-	Terminal:    true,
-	parent:      n3,
-}
-
-var n6 = &Node{
-	Sample:      Sample{},
-	FilterValue: "",
-	Label:       "n6",
-	Terminal:    true,
-	parent:      n3,
-}
+var n2 *Node
+var n3 *Node
+var n4 *Node
+var n5 *Node
+var n6 *Node
