@@ -16,12 +16,12 @@ func gain(entropySet float64, attrValues ...AttributeValue) float64 {
 func entropy(occurrences []int) float64 {
 	var entropy float64
 	var total int
-	for _, o := range occurrences {
+	for _, occ := range occurrences {
 		// if any target has zero occurrences, entropy is 0
-		if o == 0 {
+		if occ == 0 {
 			return 0
 		}
-		total = total + o
+		total += occ
 	}
 	occurrenceRatios := make([]float64, len(occurrences))
 	for i := range occurrences {

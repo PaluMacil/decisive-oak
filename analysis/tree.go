@@ -4,13 +4,13 @@ import (
 	"github.com/PaluMacil/decisive-oak/parse"
 )
 
-func BuildTree(sample parse.Sample) Node {
+func BuildTree(sample parse.Sample) *Node {
 	newSample := NewSample(sample)
 	rootNode := build(newSample, "", nil)
 	return rootNode
 }
 
-func build(sample Sample, filterValue string, parent *Node) Node {
+func build(sample Sample, filterValue string, parent *Node) *Node {
 	s := NewSample(sample.data)
 	if filterValue != "" {
 		s = NewSample(sample.data.Filter(parent.Sample.BestGainAttribute.Name, filterValue))
@@ -23,7 +23,7 @@ func build(sample Sample, filterValue string, parent *Node) Node {
 	// 1) Every element in the subset belongs to the same class;
 	// in which case the node is turned into a leaf node and labelled with the class of the examples.
 	if len(s.Targets) == 1 && len(s.data.Examples) > 0 {
-		return Node{
+		return &Node{
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
@@ -36,7 +36,7 @@ func build(sample Sample, filterValue string, parent *Node) Node {
 	// class. In this case, the node is made a leaf node and labelled with the most common class of
 	// the examples in the subset.
 	if len(s.AttributeTypes) == 0 && len(s.data.Examples) > 0 {
-		node := Node{
+		node := &Node{
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
@@ -53,7 +53,7 @@ func build(sample Sample, filterValue string, parent *Node) Node {
 	// among the population with age over 100 years. Then a leaf node is created and labelled with the
 	// most common class of the examples in the parent node's set.
 	if len(s.data.Examples) == 0 {
-		return Node{
+		return &Node{
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
@@ -64,7 +64,7 @@ func build(sample Sample, filterValue string, parent *Node) Node {
 	}
 
 	bestGainAttribute := s.BestGainAttribute
-	node := Node{
+	node := &Node{
 		parent:      parent,
 		Sample:      s,
 		FilterValue: filterValue,
@@ -73,7 +73,7 @@ func build(sample Sample, filterValue string, parent *Node) Node {
 	}
 	var children []Node
 	for _, value := range bestGainAttribute.Values {
-		build(s, value.Value, &node)
+		build(s, value.Value, node)
 	}
 	node.Children = children
 
@@ -103,6 +103,33 @@ type Node struct {
 	FilterValue string
 	Label       string
 	Terminal    bool
+}
+
+type Root Node
+
+func (r Root) CountNodes() int {
+	node := Node(r)
+	total := new(int)
+	return countNodes(&node, total)
+}
+
+func countNodes(currentNode *Node, runningTotal *int) int {
+	*runningTotal += 1
+	for _, n := range currentNode.Children {
+		countNodes(&n, runningTotal)
+	}
+
+	return *runningTotal
+}
+
+func (n Node) Root() Root {
+	node := n
+	for {
+		if node.parent == nil {
+			return Root(node)
+		}
+		node = *node.parent
+	}
 }
 
 func (n Node) mostCommonTarget() string {
