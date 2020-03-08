@@ -1,6 +1,7 @@
 package analysis
 
 import (
+	"github.com/PaluMacil/decisive-oak/parse"
 	"os"
 	"testing"
 )
@@ -23,6 +24,18 @@ func TestRoot_CountNodes(t *testing.T) {
 	count := tree.Root().CountNodes()
 	if count != 6 {
 		t.Errorf("expected 6, got %d", count)
+	}
+}
+
+func TestBuildTree(t *testing.T) {
+	sample, err := parse.FromFile("../new-treatment.data.txt")
+	if err != nil {
+		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
+	}
+	tree := BuildTree(sample)
+	nodeCount := tree.Root().CountNodes()
+	if nodeCount != 3 {
+		t.Errorf("node count: expected 3, got %d", nodeCount)
 	}
 }
 
