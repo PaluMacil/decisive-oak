@@ -36,7 +36,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		rootNode := analysis.BuildTree(sample)
+		rootNode, err := analysis.BuildTree(sample)
+		if err != nil {
+			fmt.Printf("building tree failed: %s", err.Error())
+			os.Exit(1)
+		}
 		jsonData, err = json.MarshalIndent(rootNode, "", "  ")
 		if err != nil {
 			fmt.Printf("marshalling tree to JSON: %v", err)

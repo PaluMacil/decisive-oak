@@ -16,10 +16,14 @@ type Sample struct {
 
 // Filter takes the given attribute name and value and filters the Sample to reflect only this,
 // returning a reduced Sample copy
-func (s Sample) Filter(attrName, attrValue string) Sample {
+func (s Sample) Filter(attrName, attrValue string) (Sample, error) {
 	var filteredExamples Examples
 	remainingTargetSet := make(map[string]bool)
-	attrIndex := s.AttributeTypes.Index(attrName)
+	attrIndex, err := s.AttributeTypes.Index(attrName)
+	if err != nil {
+		return s, fmt.Errorf("filtering by %s, value %s: %w",
+			attrName, attrValue, err)
+	}
 	for _, eg := range s.Examples {
 		match := eg.StringValues[attrIndex] == attrValue
 		eg = eg.DeleteValue(attrIndex)
@@ -34,12 +38,17 @@ func (s Sample) Filter(attrName, attrValue string) Sample {
 		s.Targets = append(s.Targets, target)
 	}
 	s.NumTargets = len(s.Targets)
-	s.AttributeTypes = s.AttributeTypes.Delete(attrName)
+	at, err := s.AttributeTypes.Delete(attrName)
+	if err != nil {
+		return s, fmt.Errorf("filtering by %s, value %s: %w",
+			attrName, attrValue, err)
+	}
+	s.AttributeTypes = at
 	s.NumAttributes = s.NumAttributes - 1
 	s.Examples = filteredExamples
 	s.NumExamples = len(s.Examples)
 
-	return s
+	return s, nil
 }
 
 type Targets []string
@@ -53,38 +62,49 @@ func (t Targets) IsValid(target string) bool {
 	return false
 }
 
-func (t Targets) Index(target string) int {
+func (t Targets) Index(target string) (int, error) {
 	for i, thisTarget := range t {
 		if thisTarget == target {
 
-			return i
+			return i, nil
 		}
 	}
 
-	return -1
+	return -1, ErrIndexNotFound{For: target}
+}
+
+type ErrIndexNotFound struct {
+	For string
+}
+
+func (e ErrIndexNotFound) Error() string {
+	return fmt.Sprintf("could not find index for %s",
+		e.For)
 }
 
 type AttributeTypes []AttributeType
 
-func (at AttributeTypes) Index(name string) int {
+func (at AttributeTypes) Index(name string) (int, error) {
 	for i, attr := range at {
 		if attr.Name == name {
 
-			return i
+			return i, nil
 		}
 	}
 
-	return -1
+	return -1, ErrIndexNotFound{For: name}
 }
 
-func (at AttributeTypes) Delete(name string) AttributeTypes {
+func (at AttributeTypes) Delete(name string) (AttributeTypes, error) {
 	attributeTypes := []AttributeType(at)
-	i := at.Index(name)
-	if i != -1 {
-		attributeTypes = append(attributeTypes[:i], attributeTypes[i+1:]...)
+	i, err := at.Index(name)
+	if err != nil {
+		return attributeTypes,
+			fmt.Errorf("deleting attribute type: %w", err)
 	}
+	attributeTypes = append(attributeTypes[:i], attributeTypes[i+1:]...)
 
-	return attributeTypes
+	return attributeTypes, nil
 }
 
 func (at AttributeTypes) String() string {
@@ -126,20 +146,28 @@ func (at AttributeType) IsValidValue(value string) bool {
 
 // OccurrencesInTargets returns an AttributeOccurrenceLookup with method
 // AttributeValueTotal(attrValue string) int
-func (at AttributeType) OccurrencesInTargets(s Sample) AttributeOccurrenceLookup {
+func (at AttributeType) OccurrencesInTargets(s Sample) (AttributeOccurrenceLookup, error) {
 	lookup := make(AttributeOccurrenceLookup)
 	for _, value := range at.Values {
 		lookup[value] = make([]int, s.NumTargets)
 	}
 
-	attrIndex := s.AttributeTypes.Index(at.Name)
+	attrIndex, err := s.AttributeTypes.Index(at.Name)
+	if err != nil {
+		return lookup, fmt.Errorf("finding attribute type %s: %w",
+			at.Name, err)
+	}
 	for _, eg := range s.Examples {
 		attrValue := eg.StringValues[attrIndex]
-		targetIndex := s.Targets.Index(eg.Target)
+		targetIndex, err := s.Targets.Index(eg.Target)
+		if err != nil {
+			return lookup, fmt.Errorf("finding target %s: %w",
+				eg.Target, err)
+		}
 		lookup[attrValue][targetIndex] += 1
 	}
 
-	return lookup
+	return lookup, nil
 }
 
 // AttributeOccurrenceLookup is a map of attribute value to slice of int.

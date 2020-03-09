@@ -6,7 +6,7 @@ import (
 )
 
 func Test_AttributeTypes_Index(t *testing.T) {
-	i := attributeTypes.Index("astigmatism")
+	i, _ := attributeTypes.Index("astigmatism")
 	const expected = 2
 	if i != expected {
 		t.Errorf("for 'astigmatism' expected index %d, got %d", expected, i)
@@ -17,9 +17,18 @@ func Test_AttributeTypes_Delete(t *testing.T) {
 	at := make(parse.AttributeTypes, len(attributeTypes))
 	copy(at, attributeTypes)
 	originalLength := len(at)
-	at = at.Delete("age")
+	at, err := at.Delete("age")
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if at == nil {
+		t.Errorf("attribute types were nil after delete")
+	}
 	if len(at) != originalLength-1 {
 		t.Errorf("after deleting an element, expected length %d, got %d", originalLength-1, len(at))
+	}
+	if _, err = at.Delete("fakeNotExist"); err == nil {
+		t.Error("expected error when deleting attribute type that doesn't exist")
 	}
 }
 
@@ -54,25 +63,34 @@ func Test_AttributeOccurrenceLookup_AttributeValueTotal(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
 	}
-	if checkTotal(sample, "age", "<25") != 1 {
+	if checkTotal(sample, "age", "<25", t) != 1 {
 		t.Errorf("total for age >25 should be 1")
 	}
-	if checkTotal(sample, "pulse", "normal") != 3 {
+	if checkTotal(sample, "pulse", "normal", t) != 3 {
 		t.Errorf("total for pulse normal should be 3")
 	}
-	if checkTotal(sample, "pulse", "rapid") != 2 {
+	if checkTotal(sample, "pulse", "rapid", t) != 2 {
 		t.Errorf("total for pulse normal should be 2")
 	}
-	if checkTotal(sample, "bp", "normal") != 3 {
+	if checkTotal(sample, "bp", "normal", t) != 3 {
 		t.Errorf("total for bp normal should be 3")
 	}
 }
 
-func checkTotal(sample parse.Sample, attrTypeName, attrValue string) int {
-	return sample.AttributeTypes[sample.AttributeTypes.
-		Index(attrTypeName)].
-		OccurrencesInTargets(sample).
-		AttributeValueTotal(attrValue)
+func checkTotal(sample parse.Sample, attrTypeName, attrValue string, t *testing.T) int {
+	idx, err := sample.AttributeTypes.Index(attrTypeName)
+	if err != nil {
+		t.Errorf("checking total: %s", err.Error())
+	}
+	lookup, err := sample.AttributeTypes[idx].OccurrencesInTargets(sample)
+	if err != nil {
+		t.Errorf("getting occurrences in targets: %s", err.Error())
+	}
+	if lookup == nil {
+		t.Error("lookup was nil")
+	}
+
+	return lookup.AttributeValueTotal(attrValue)
 }
 
 func Test_Example_DeleteValue(t *testing.T) {
@@ -97,7 +115,10 @@ func Test_Sample_Filter(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed parsing file contact-lenses.data.txt: %v", err)
 	}
-	ageSample := sample.Filter("age", "young")
+	ageSample, err := sample.Filter("age", "young")
+	if err != nil {
+		t.Errorf("filtering on age, young: %s", err.Error())
+	}
 	if ageSample.NumTargets != 3 {
 		t.Errorf("filtering on age young: expected NumTargets %d, got %d",
 			3, ageSample.NumTargets)
@@ -120,7 +141,10 @@ func Test_Sample_Filter(t *testing.T) {
 		t.Errorf("filtering on age young: expected 8 examples, got %d", len(ageSample.Examples))
 	}
 
-	astigmatismSample := ageSample.Filter("astigmatism", "no")
+	astigmatismSample, err := ageSample.Filter("astigmatism", "no")
+	if err != nil {
+		t.Errorf("filtering on astigmatism, no: %s", err.Error())
+	}
 	if astigmatismSample.NumTargets != 2 {
 		t.Errorf("filtering on astigmatism no: expected NumTargets %d, got %d",
 			2, astigmatismSample.NumTargets)

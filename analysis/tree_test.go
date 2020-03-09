@@ -32,7 +32,10 @@ func TestBuildTree(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
 	}
-	tree := BuildTree(sample)
+	tree, err := BuildTree(sample)
+	if err != nil {
+		t.Errorf("building tree failed: %s", err.Error())
+	}
 	nodeCount := tree.Root().CountNodes()
 	if nodeCount != 3 {
 		t.Errorf("node count: expected 3, got %d", nodeCount)
