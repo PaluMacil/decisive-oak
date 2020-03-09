@@ -30,7 +30,7 @@ func (s Sample) Filter(attrName, attrValue string) Sample {
 	}
 	// reset targets list
 	s.Targets = make(Targets, 0)
-	for target, _ := range remainingTargetSet {
+	for target := range remainingTargetSet {
 		s.Targets = append(s.Targets, target)
 	}
 	s.NumTargets = len(s.Targets)

@@ -1,16 +1,22 @@
 package analysis
 
 import (
+	"fmt"
 	"github.com/PaluMacil/decisive-oak/parse"
 )
 
-func BuildTree(sample parse.Sample) *Node {
+func BuildTree(sample parse.Sample) Node {
 	newSample := NewSample(sample)
 	rootNode := build(newSample, "", nil)
 	return rootNode
 }
 
-func build(sample Sample, filterValue string, parent *Node) *Node {
+func build(sample Sample, filterValue string, parent *Node) Node {
+	if parent == nil {
+		fmt.Println("starting first node")
+	} else {
+		fmt.Println("starting node", filterValue, parent.Sample.BestGainAttribute.Name)
+	}
 	var s Sample
 	if filterValue != "" {
 		// data passed in before filtering
@@ -30,7 +36,7 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 	// 1) Every element in the subset belongs to the same class;
 	// in which case the node is turned into a leaf node and labelled with the class of the examples.
 	if len(s.Targets) == 1 && len(s.data.Examples) > 0 {
-		return &Node{
+		node := Node{
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
@@ -38,12 +44,14 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 			Label:       s.Targets[0],
 			Terminal:    true,
 		}
+		fmt.Println("completed node", node.FilterValue, node.Label)
+		return node
 	}
 	// 2) There are no more attributes to be selected, but the examples still do not belong to the same
 	// class. In this case, the node is made a leaf node and labelled with the most common class of
 	// the examples in the subset.
 	if len(s.AttributeTypes) == 0 && len(s.data.Examples) > 0 {
-		node := &Node{
+		node := Node{
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
@@ -52,6 +60,7 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 		}
 		node.Label = node.mostCommonTarget()
 
+		fmt.Println("completed node", node.FilterValue, node.Label)
 		return node
 	}
 
@@ -60,7 +69,7 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 	// among the population with age over 100 years. Then a leaf node is created and labelled with the
 	// most common class of the examples in the parent node's set.
 	if len(s.data.Examples) == 0 {
-		return &Node{
+		node := Node{
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
@@ -68,23 +77,30 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 			Label:       parent.mostCommonTarget(),
 			Terminal:    true,
 		}
+		fmt.Println("completed node", node.FilterValue, node.Label)
+		return node
 	}
 
 	bestGainAttribute := s.BestGainAttribute
-	node := &Node{
+	fmt.Printf("\t%s has %d values\n", bestGainAttribute.Name, len(bestGainAttribute.Values))
+	node := Node{
 		parent:      parent,
 		Sample:      s,
 		FilterValue: filterValue,
 		Label:       bestGainAttribute.Name,
 		Terminal:    false,
 	}
+
 	var children []Node
 	for _, value := range bestGainAttribute.Values {
-		child := build(s, value.Value, node)
-		children = append(children, *child)
+		fmt.Println("\texamining value", value.Value, "of", bestGainAttribute.Name)
+		fmt.Println("\tsecond attribute type name matches:", s.AttributeTypes[1].Name == s.data.AttributeTypes[1].Name)
+		child := build(s, value.Value, &node)
+		children = append(children, child)
 	}
 	node.Children = children
 
+	fmt.Println("completed node", node.FilterValue, node.Label)
 	return node
 }
 
