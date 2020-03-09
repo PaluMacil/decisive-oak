@@ -17,6 +17,8 @@ type Sample struct {
 // Filter takes the given attribute name and value and filters the Sample to reflect only this,
 // returning a reduced Sample copy
 func (s Sample) Filter(attrName, attrValue string) (Sample, error) {
+	fmt.Printf("Filtering parse sample on attribute type %s, value %s\n", attrName, attrValue)
+	fmt.Printf("pre-filter attribute type names and values:\n%s", s.AttributeTypes.TerminalSummary())
 	var filteredExamples Examples
 	remainingTargetSet := make(map[string]bool)
 	attrIndex, err := s.AttributeTypes.Index(attrName)
@@ -47,6 +49,7 @@ func (s Sample) Filter(attrName, attrValue string) (Sample, error) {
 	s.NumAttributes = s.NumAttributes - 1
 	s.Examples = filteredExamples
 	s.NumExamples = len(s.Examples)
+	fmt.Printf("post-filter attribute type names and values:\n%s", s.AttributeTypes.TerminalSummary())
 
 	return s, nil
 }
@@ -83,6 +86,24 @@ func (e ErrIndexNotFound) Error() string {
 }
 
 type AttributeTypes []AttributeType
+
+func (at AttributeTypes) TerminalSummary() string {
+	sb := strings.Builder{}
+	for _, attrType := range at {
+		attrTypeString := fmt.Sprintf("\t... %s: ", attrType.Name)
+		sb.WriteString(attrTypeString)
+		for i, attrValue := range attrType.Values {
+			sb.WriteString(attrValue)
+			// print values in a comma-separated list on one line
+			if i != len(attrType.Values)-1 {
+				sb.WriteString(", ")
+			}
+		}
+		sb.WriteString("\n")
+	}
+
+	return sb.String()
+}
 
 func (at AttributeTypes) Index(name string) (int, error) {
 	for i, attr := range at {
