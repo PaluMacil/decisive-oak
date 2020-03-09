@@ -11,9 +11,16 @@ func BuildTree(sample parse.Sample) *Node {
 }
 
 func build(sample Sample, filterValue string, parent *Node) *Node {
-	s := NewSample(sample.data)
+	var s Sample
 	if filterValue != "" {
-		s = NewSample(sample.data.Filter(parent.Sample.BestGainAttribute.Name, filterValue))
+		// data passed in before filtering
+		unfilteredSampleData := sample.data
+		// data filtered by parent's best gain attribute and the filter value for this child node
+		filteredData := unfilteredSampleData.Filter(parent.Sample.BestGainAttribute.Name, filterValue)
+		s = NewSample(filteredData)
+	} else {
+		// if not filtering the data
+		s = sample
 	}
 
 	/*
@@ -27,7 +34,7 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
-			FilterValue: "",
+			FilterValue: filterValue,
 			Label:       s.Targets[0],
 			Terminal:    true,
 		}
@@ -40,7 +47,7 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 			parent:      parent,
 			Children:    nil,
 			Sample:      s,
-			FilterValue: "",
+			FilterValue: filterValue,
 			Terminal:    true,
 		}
 		node.Label = node.mostCommonTarget()
@@ -73,7 +80,8 @@ func build(sample Sample, filterValue string, parent *Node) *Node {
 	}
 	var children []Node
 	for _, value := range bestGainAttribute.Values {
-		build(s, value.Value, node)
+		child := build(s, value.Value, node)
+		children = append(children, *child)
 	}
 	node.Children = children
 
