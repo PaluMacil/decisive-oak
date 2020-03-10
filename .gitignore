@@ -5,13 +5,6 @@ decisive-oak
 *.tree.json
 *.skip
 
-# data
-*.db
-*.db.lock
-data-test/
-data/
-*-bak.txt
-
 # compiled output
 /dist
 /tmp
