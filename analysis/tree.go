@@ -100,7 +100,9 @@ func build(sample Sample, filterValue string, parent *Node) (Node, error) {
 	}
 
 	bestGainAttribute := s.BestGainAttribute
-	fmt.Printf("\t%s has %d values\n", bestGainAttribute.Name, len(bestGainAttribute.Values))
+	if bestGainAttribute.Name != "" {
+		fmt.Printf("\tbest gain attribute '%s' has %d values\n", bestGainAttribute.Name, len(bestGainAttribute.Values))
+	}
 	node := Node{
 		parent:      parent,
 		Sample:      s,

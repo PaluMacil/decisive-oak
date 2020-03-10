@@ -141,30 +141,38 @@ func Test_Sample_Filter(t *testing.T) {
 		t.Errorf("filtering on age young: expected 8 examples, got %d", len(ageSample.Examples))
 	}
 
-	astigmatismSample, err := ageSample.Filter("astigmatism", "no")
+	astigmatismNoSample, err := ageSample.Filter("astigmatism", "no")
 	if err != nil {
 		t.Errorf("filtering on astigmatism, no: %s", err.Error())
 	}
-	if astigmatismSample.NumTargets != 2 {
+	if astigmatismNoSample.NumTargets != 2 {
 		t.Errorf("filtering on astigmatism no: expected NumTargets %d, got %d",
-			2, astigmatismSample.NumTargets)
+			2, astigmatismNoSample.NumTargets)
 	}
-	if len(astigmatismSample.Targets) != 2 {
+	if len(astigmatismNoSample.Targets) != 2 {
 		t.Errorf("filtering on astigmatism no: expected length of Targets %d, got %d",
-			2, len(astigmatismSample.Targets))
+			2, len(astigmatismNoSample.Targets))
 	}
-	if astigmatismSample.NumAttributes != ageSample.NumAttributes-1 {
+	if astigmatismNoSample.NumAttributes != ageSample.NumAttributes-1 {
 		t.Errorf("filtering on astigmatism no: expected NumAttributes to decrease by one")
 	}
-	if len(astigmatismSample.AttributeTypes) != 2 {
+	if len(astigmatismNoSample.AttributeTypes) != 2 {
 		t.Errorf("filtering on astigmatism no: expected AttributeTypes %d, got %d",
-			2, len(astigmatismSample.AttributeTypes))
+			2, len(astigmatismNoSample.AttributeTypes))
 	}
-	if astigmatismSample.NumExamples != len(astigmatismSample.Examples) {
+	if astigmatismNoSample.NumExamples != len(astigmatismNoSample.Examples) {
 		t.Errorf("filtering on astigmatism no: expected NumExamples to equal Examples length")
 	}
-	if len(astigmatismSample.Examples) != 4 {
+	if len(astigmatismNoSample.Examples) != 4 {
 		t.Errorf("filtering on astigmatism no: expected 4 examples, got %d", len(ageSample.Examples))
+	}
+
+	astigmatismYesSample, err := ageSample.Filter("astigmatism", "yes")
+	if err != nil {
+		t.Errorf("filtering on astigmatism, yes: %s", err.Error())
+	}
+	if len(astigmatismYesSample.Examples) != 4 {
+		t.Errorf("filtering on astigmatism yes: expected 4 examples, got %d", len(astigmatismYesSample.Examples))
 	}
 }
 

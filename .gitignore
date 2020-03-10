@@ -2,6 +2,8 @@
 *.exe~
 decisive-oak
 *.data.json
+*.tree.json
+*.skip
 
 # data
 *.db

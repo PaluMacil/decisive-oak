@@ -52,5 +52,6 @@ func main() {
 			fmt.Printf("writing tree file: %v", err)
 			os.Exit(1)
 		}
+		fmt.Printf("Wrote %s\n\n", treeFilename)
 	}
 }

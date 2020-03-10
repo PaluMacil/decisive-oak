@@ -17,16 +17,17 @@ type Sample struct {
 // Filter takes the given attribute name and value and filters the Sample to reflect only this,
 // returning a reduced Sample copy
 func (s Sample) Filter(attrName, attrValue string) (Sample, error) {
+	sample := s
 	fmt.Printf("Filtering parse sample on attribute type %s, value %s\n", attrName, attrValue)
-	fmt.Printf("pre-filter attribute type names and values:\n%s", s.AttributeTypes.TerminalSummary())
+	fmt.Printf("pre-filter attribute type names and values:\n%s", sample.AttributeTypes.TerminalSummary())
 	var filteredExamples Examples
 	remainingTargetSet := make(map[string]bool)
-	attrIndex, err := s.AttributeTypes.Index(attrName)
+	attrIndex, err := sample.AttributeTypes.Index(attrName)
 	if err != nil {
-		return s, fmt.Errorf("filtering by %s, value %s: %w",
+		return sample, fmt.Errorf("filtering by %s, value %s: %w",
 			attrName, attrValue, err)
 	}
-	for _, eg := range s.Examples {
+	for _, eg := range sample.Examples {
 		match := eg.StringValues[attrIndex] == attrValue
 		eg = eg.DeleteValue(attrIndex)
 		if match {
@@ -35,23 +36,23 @@ func (s Sample) Filter(attrName, attrValue string) (Sample, error) {
 		}
 	}
 	// reset targets list
-	s.Targets = make(Targets, 0)
+	sample.Targets = make(Targets, 0)
 	for target := range remainingTargetSet {
-		s.Targets = append(s.Targets, target)
+		sample.Targets = append(sample.Targets, target)
 	}
-	s.NumTargets = len(s.Targets)
-	at, err := s.AttributeTypes.Delete(attrName)
+	sample.NumTargets = len(sample.Targets)
+	at, err := sample.AttributeTypes.Delete(attrName)
 	if err != nil {
-		return s, fmt.Errorf("filtering by %s, value %s: %w",
+		return sample, fmt.Errorf("filtering by %s, value %s: %w",
 			attrName, attrValue, err)
 	}
-	s.AttributeTypes = at
-	s.NumAttributes = s.NumAttributes - 1
-	s.Examples = filteredExamples
-	s.NumExamples = len(s.Examples)
-	fmt.Printf("post-filter attribute type names and values:\n%s", s.AttributeTypes.TerminalSummary())
+	sample.AttributeTypes = at
+	sample.NumAttributes = sample.NumAttributes - 1
+	sample.Examples = filteredExamples
+	sample.NumExamples = len(sample.Examples)
+	fmt.Printf("post-filter attribute type names and values:\n%s", sample.AttributeTypes.TerminalSummary())
 
-	return s, nil
+	return sample, nil
 }
 
 type Targets []string
@@ -117,7 +118,8 @@ func (at AttributeTypes) Index(name string) (int, error) {
 }
 
 func (at AttributeTypes) Delete(name string) (AttributeTypes, error) {
-	attributeTypes := []AttributeType(at)
+	attributeTypes := make(AttributeTypes, len(at))
+	copy(attributeTypes, at)
 	i, err := at.Index(name)
 	if err != nil {
 		return attributeTypes,
@@ -220,11 +222,9 @@ type Example struct {
 }
 
 func (eg Example) DeleteValue(index int) Example {
-	if len(eg.StringValues) > 0 {
-		eg.StringValues = append(eg.StringValues[:index], eg.StringValues[index+1:]...)
-	} else {
-		eg.RealValues = append(eg.RealValues[:index], eg.RealValues[index+1:]...)
-	}
+	stringValues := make([]string, len(eg.StringValues))
+	copy(stringValues, eg.StringValues)
+	eg.StringValues = append(stringValues[:index], stringValues[index+1:]...)
 
 	return eg
 }
