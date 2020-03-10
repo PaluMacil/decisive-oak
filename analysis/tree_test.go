@@ -8,7 +8,7 @@ import (
 )
 
 func Test_getAttributeTypes(t *testing.T) {
-	sampleData, err := parse.FromFile("../new-treatment.data.txt")
+	sampleData, err := parse.FromFile("../out/new-treatment.data.txt")
 	if err != nil {
 		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
 	}
@@ -35,7 +35,7 @@ func Test_getAttributeTypes(t *testing.T) {
 }
 
 func TestNewSample(t *testing.T) {
-	sampleData, err := parse.FromFile("../new-treatment.data.txt")
+	sampleData, err := parse.FromFile("../out/new-treatment.data.txt")
 	if err != nil {
 		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
 	}
@@ -71,7 +71,7 @@ func TestRoot_CountNodes(t *testing.T) {
 }
 
 func TestBuildTree(t *testing.T) {
-	sample, err := parse.FromFile("../new-treatment.data.txt")
+	sample, err := parse.FromFile("../out/new-treatment.data.txt")
 	if err != nil {
 		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
 	}

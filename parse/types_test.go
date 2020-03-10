@@ -59,7 +59,7 @@ func Test_AttributeType_IsValidValue(t *testing.T) {
 }
 
 func Test_AttributeOccurrenceLookup_AttributeValueTotal(t *testing.T) {
-	sample, err := parse.FromFile("../new-treatment.data.txt")
+	sample, err := parse.FromFile("../data/new-treatment.data.txt")
 	if err != nil {
 		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
 	}
@@ -111,7 +111,7 @@ func Test_Example_DeleteValue(t *testing.T) {
 }
 
 func Test_Sample_Filter(t *testing.T) {
-	sample, err := parse.FromFile("../contact-lenses.data.txt")
+	sample, err := parse.FromFile("../data/contact-lenses.data.txt")
 	if err != nil {
 		t.Errorf("failed parsing file contact-lenses.data.txt: %v", err)
 	}

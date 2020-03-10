@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	files, err := filepath.Glob("*.data.txt")
+	files, err := filepath.Glob("data/*.data.txt")
 	if err != nil {
 		fmt.Printf("finding data files: %v", err)
 		os.Exit(1)
@@ -31,6 +31,7 @@ func main() {
 			os.Exit(1)
 		}
 		outFilename := strings.TrimSuffix(filename, path.Ext(filename)) + ".json"
+		outFilename = path.Join("out", filepath.Base(outFilename))
 		err = ioutil.WriteFile(outFilename, jsonData, 0644)
 		if err != nil {
 			fmt.Printf("writing output file: %v", err)
@@ -48,6 +49,7 @@ func main() {
 			os.Exit(1)
 		}
 		treeFilename := strings.TrimSuffix(filename, path.Ext(filename)) + ".tree.json"
+		treeFilename = path.Join("out", filepath.Base(treeFilename))
 		err = ioutil.WriteFile(treeFilename, jsonData, 0644)
 		if err != nil {
 			fmt.Printf("writing tree file: %v", err)
