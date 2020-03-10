@@ -8,8 +8,8 @@ used to classify data in a way that is simple for a human to comprehend and the 
 decisions is visually described by the graph drawn from the training sample.
 
 From Wikipedia:
->In decision tree learning, ID3 (Iterative Dichotomiser 3) is an algorithm invented by Ross Quinlan[1] used to generate a decision tree from a dataset. ID3 is the precursor to the C4.5 algorithm, and is typically used in the machine learning and natural language processing domains.
 
+>In decision tree learning, ID3 (Iterative Dichotomiser 3) is an algorithm invented by Ross Quinlan[1] used to generate a decision tree from a dataset. ID3 is the precursor to the C4.5 algorithm, and is typically used in the machine learning and natural language processing domains.
 
 ### Project Student and Course Name
 
@@ -23,7 +23,9 @@ From Wikipedia:
 
 *Problem:* Given data in clean, self describing format, create a decision tree that makes repeated locally 
 optimal decisions on how to divide the data set by an attribute that results in the greatest descrease in 
-entropy (disorder). This is also called information gain. 
+entropy (disorder). This is also called information gain.
+
+### Third Party Software
 
 #### Formulas
 
@@ -31,7 +33,7 @@ entropy (disorder). This is also called information gain.
 
 ![gain](data/gain.png)
 
-##### Implementation
+##### Code
 
 ```
 func gain(entropySet float64, attrValues ...AttributeValue) float64 {
@@ -55,7 +57,7 @@ func gain(entropySet float64, attrValues ...AttributeValue) float64 {
 
 ![entropy](data/entropy.png)
 
-##### Implementation:
+##### Code
 
 ```
 func entropy(occurrences []int) float64 {
@@ -82,6 +84,12 @@ func entropy(occurrences []int) float64 {
 ```
 
 #### Organization
+
+- analysis
+- data
+- out
+- parse
+- serve
 
 #### Challenges and Considerations
 

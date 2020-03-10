@@ -9,7 +9,7 @@ abbr,acronym { border:0; }
 
 body { background: #fff; }
 /* optional Container STYLES */
-.chart { height: 550px; margin: 5px; width: 900px;  }
+.chart { height: 550px; margin: 5px; width: 100%;  }
 .Treant > .node {  }
 .Treant > p { font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; font-weight: bold; font-size: 12px; }
 .node-name { font-weight: lighter;}
@@ -49,7 +49,7 @@ body { background: #fff; }
     color: white; /* White text */
     padding: 10px 24px; /* Some padding */
     cursor: pointer; /* Pointer/hand icon */
-    width: 50%; /* Set a width if needed */
+    width: 100%; /* Set a width if needed */
     display: block; /* Make the buttons appear below each other */
   }
   
