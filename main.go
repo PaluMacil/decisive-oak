@@ -19,6 +19,7 @@ func main() {
 		os.Exit(1)
 	}
 	for _, filename := range files {
+		fmt.Println("opening", filename)
 		sample, err := parse.FromFile(filename)
 		if err != nil {
 			fmt.Printf("parsing %s: %v", filename, err)

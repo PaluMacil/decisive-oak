@@ -114,7 +114,6 @@ func build(sample Sample, filterValue string, parent *Node) (Node, error) {
 	var children []Node
 	for _, value := range bestGainAttribute.Values {
 		fmt.Println("\texamining value", value.Value, "of", bestGainAttribute.Name)
-		fmt.Println("\tsecond attribute type name matches:", s.AttributeTypes[1].Name == s.data.AttributeTypes[1].Name)
 		child, err := build(s, value.Value, &node)
 		if err != nil {
 			var label string

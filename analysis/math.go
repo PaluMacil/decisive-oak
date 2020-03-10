@@ -5,9 +5,16 @@ import (
 )
 
 func gain(entropySet float64, attrValues ...AttributeValue) float64 {
+	// for denominator under occurrences of each attribute value occurrence
+	var setSize int
+	for _, av := range attrValues {
+		setSize += av.Occurrences
+	}
+
 	thisGain := entropySet
 	for _, av := range attrValues {
-		thisGain = thisGain - (float64(av.Occurrences) * av.Entropy)
+		pOfValue := float64(av.Occurrences) / float64(setSize)
+		thisGain = thisGain - (pOfValue * av.Entropy)
 	}
 
 	return thisGain

@@ -1,10 +1,53 @@
 package analysis
 
 import (
+	"fmt"
 	"github.com/PaluMacil/decisive-oak/parse"
 	"os"
 	"testing"
 )
+
+func Test_getAttributeTypes(t *testing.T) {
+	sampleData, err := parse.FromFile("../new-treatment.data.txt")
+	if err != nil {
+		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
+	}
+	sample, err := NewSample(sampleData)
+	if err != nil {
+		t.Errorf("building analysis sample failed: %s", err.Error())
+	}
+	ats, err := getAttributeTypes(sampleData, sample.Entropy)
+	if err != nil {
+		t.Errorf("getting attribute types: %s", err.Error())
+	}
+	pulseGain := fmt.Sprintf("%.3f", ats[0].Gain)
+	if pulseGain != "0.020" {
+		t.Errorf("pulse gain should be 0.020, got %s", pulseGain)
+	}
+	bpGain := fmt.Sprintf("%.3f", ats[1].Gain)
+	if bpGain != "0.971" {
+		t.Errorf("bp gain should be 0.971, got %s", bpGain)
+	}
+	ageGain := fmt.Sprintf("%.3f", ats[2].Gain)
+	if ageGain != "0.420" {
+		t.Errorf("age gain should be 0.420, got %s", ageGain)
+	}
+}
+
+func TestNewSample(t *testing.T) {
+	sampleData, err := parse.FromFile("../new-treatment.data.txt")
+	if err != nil {
+		t.Errorf("failed parsing file new-treatment.data.txt: %v", err)
+	}
+	sample, err := NewSample(sampleData)
+	if err != nil {
+		t.Errorf("building analysis sample failed: %s", err.Error())
+	}
+	setEntropy := fmt.Sprintf("%.3f", sample.Entropy)
+	if setEntropy != "0.971" {
+		t.Errorf("expected set entropy to be 0.971, got %s", setEntropy)
+	}
+}
 
 func TestNode_Root(t *testing.T) {
 	lbl1, lbl3, lbl6 := n1.Root().Label, n3.Root().Label, n6.Root().Label
