@@ -430,10 +430,30 @@ completed node  bp
 Wrote out/new-treatment.data.tree.json
 ```
 
-#### Graphical Trees
+#### Graphical Trees and Server
 
 By running the `Serve.ps1` script, you can see the tree graph for any tree generated via the commandline by
-navigating to http://localhost:3000
+navigating to http://localhost:3000 While the go server does not handle timeouts or extensive error handling, it can run securely behind a reverse proxy such as IIS, Apache, Nginx, or Caddy. If running directly, one should only use it locally or on a secure network.
+
+A list endpoint reports all the tree files it finds in the out folder so that the frontend can build a dynamic menu. See the first chart example below for the menu. This tree data is located by the server's glob pattern which searches the out directory for tree json files and presents them upon request.
+
+#### Contact Lens
+
+Raw parse data is stored in `contact-lenses.data.json` and the analysis data for the contact lens tree is output to `contact-lenses.data.tree.json`.
+
+![entropy](data/contact-lens.png)
+
+#### Fishing
+
+Raw parse data is stored in `fishing.data.json` and the analysis data for the contact lens tree is output to `fishing.data.tree.json`.
+
+![entropy](data/fishing.png)
+
+#### New Treatment
+
+Raw parse data is stored in `new-treatment.data.json` and the analysis data for the contact lens tree is output to `new-treatment.data.tree.json`.
+
+![entropy](data/new-treatment.png)
 
 ### License, Limitations, and Usage
 
