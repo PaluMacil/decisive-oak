@@ -3,13 +3,13 @@
 ## Summary
 
 The purpose of this project is to demonstrate an application that, given a collection of training data 
-for a classification problem, generates a Decision Tree via the ID3 algorithm. This decision tree can be 
+for a classification problem, generates a decision tree via the ID3 algorithm. This decision tree can be 
 used to classify data in a way that is simple for a human to comprehend and the reasoning for making 
 decisions is visually described by the graph drawn from the training sample.
 
 From Wikipedia:
 
->In decision tree learning, ID3 (Iterative Dichotomiser 3) is an algorithm invented by Ross Quinlan[1] used to generate a decision tree from a dataset. ID3 is the precursor to the C4.5 algorithm, and is typically used in the machine learning and natural language processing domains.
+>In decision tree learning, ID3 (Iterative Dichotomiser 3) is an algorithm invented by Ross Quinlan used to generate a decision tree from a dataset. ID3 is the precursor to the C4.5 algorithm, and is typically used in the machine learning and natural language processing domains.
 
 ### Project Student and Course Name
 
@@ -85,19 +85,62 @@ func entropy(occurrences []int) float64 {
 
 #### Organization
 
-- analysis
-- data
-- out
-- parse
-- serve
+- parse: The parse package examines the text data files found in a data subdirectory of the current working directory where you run this application. Three example data sets are included in the repository. The attribute types, attribute values, targets, and examples are validated against the data file's stated totals as a type of validation for the parser as well as for the data file itself.
+- analysis: The analysis package examines the parsed data structures in order to calculate statistics at each decision tree split, make filtering and labelling decisions for nodes, and finally the tree is output to the out folder in json format.
+- data: Data includes the three examples of the standard format data inputs of raw data and final decision tree imagery examples from the server for use in this document.
+- out: The out folder contains all generated outputs, including the json format for the original data and the json-formatted tree analysis itself. The server uses these to draw its diagrams after processing.
+- serve: The serve package and accompanying javascript, css, and html files provide a web-based tool for displaying the decision tree final outputs in a visual format. The server searches the out folder for data and then provides the original detailed analysis via API endpoints. The javascript frontend transforms this recursively into the format required by the treant.js decision tree library:
+
+```
+function convertTree(root) {
+    let chart_config = {};
+    chart_config.chart = {
+        container: "#oak-tree",
+
+        nodeAlign: "BOTTOM",
+
+        connectors: {
+            type: 'step'
+        },
+        node: {
+            HTMLclass: 'nodeExample1'
+        }
+    };
+    chart_config.nodeStructure = convertNode(root);
+
+    new Treant(chart_config);
+}
+
+function convertNode(node) {
+    let newNode = {
+        text: {
+            filter: node.FilterValue,
+            label: node.Label
+        },
+        HTMLclass: node.Terminal ? 'blue' : 'light-gray'
+    };
+
+    if (node.Children && node.Children.length > 0) {
+        newNode.children = [];
+        node.Children.forEach(child => {
+            newNode.children.push(convertNode(child));
+        });
+    }
+
+    return newNode;
+}
+```
 
 #### Challenges and Considerations
+
+- Recursive analysis of data sets requires one to take care to use newly allocated copies of arrays so that modifying one split of the data does not also modify its parent, causing the next split to be invalid.
+- There is a lot of complexity in assessing recursive logic while applying math formulas at each level. To mitigate risks, I used extensive unit tests. These tested only the inputs and outputs expected from pure functions as well as derived data from data sets with previously-known metrics.
 
 ### Analysis
 
 #### Terminal Output
 
-While examining the training data, the terminal output describes the path of node-building as well as rational for making 
+While examining the training data, the terminal output describes the path of node-building as well as rationale for making 
 sample splitting decisions.
 
 ```
@@ -433,7 +476,7 @@ Wrote out/new-treatment.data.tree.json
 #### Graphical Trees and Server
 
 By running the `Serve.ps1` script, you can see the tree graph for any tree generated via the commandline by
-navigating to http://localhost:3000 While the go server does not handle timeouts or extensive error handling, it can run securely behind a reverse proxy such as IIS, Apache, Nginx, or Caddy. If running directly, one should only use it locally or on a secure network.
+navigating to http://localhost:3000 While the Go server does not handle timeouts or do extensive error handling, it can run securely behind a reverse proxy such as IIS, Apache, Nginx, or Caddy. If running without a proxy, one should only use it locally or on a secure network.
 
 A list endpoint reports all the tree files it finds in the out folder so that the frontend can build a dynamic menu. See the first chart example below for the menu. This tree data is located by the server's glob pattern which searches the out directory for tree json files and presents them upon request.
 
@@ -445,13 +488,13 @@ Raw parse data is stored in `contact-lenses.data.json` and the analysis data for
 
 #### Fishing
 
-Raw parse data is stored in `fishing.data.json` and the analysis data for the contact lens tree is output to `fishing.data.tree.json`.
+Raw parse data is stored in `fishing.data.json` and the analysis data for the fishing tree is output to `fishing.data.tree.json`.
 
 ![entropy](data/fishing.png)
 
 #### New Treatment
 
-Raw parse data is stored in `new-treatment.data.json` and the analysis data for the contact lens tree is output to `new-treatment.data.tree.json`.
+Raw parse data is stored in `new-treatment.data.json` and the analysis data for the new treatment tree is output to `new-treatment.data.tree.json`.
 
 ![entropy](data/new-treatment.png)
 
