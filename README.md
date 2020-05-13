@@ -11,14 +11,6 @@ From Wikipedia:
 
 >In decision tree learning, ID3 (Iterative Dichotomiser 3) is an algorithm invented by Ross Quinlan used to generate a decision tree from a dataset. ID3 is the precursor to the C4.5 algorithm, and is typically used in the machine learning and natural language processing domains.
 
-### Project Student and Course Name
-
-*Project 3:* Decision Trees
-
-*Student:* Daniel Wolf
-
-*Course:* CIS 678, Winter 2020
-
 ### Implementation
 
 *Problem:* Given data in clean, self describing format, create a decision tree that makes repeated locally 
@@ -500,7 +492,6 @@ Raw parse data is stored in `new-treatment.data.json` and the analysis data for 
 
 ### License, Limitations, and Usage
 
-The purpose of this project was academic in nature. I don't recommend using 
+I don't recommend using 
 this code in production. I have licensed this code with an MIT license, so 
-reuse is permissible. If you are in an academic institution, you might have 
-additional guidelines to follow.
+reuse is permissible.
