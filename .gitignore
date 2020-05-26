@@ -42,6 +42,7 @@ dwn-server
 npm-debug.log
 testem.log
 /typings
+/cover.out
 
 # e2e
 /e2e/*.js

@@ -4,20 +4,31 @@
 
 The purpose of this project is to demonstrate an application that, given a collection of training data 
 for a classification problem, generates a decision tree via the ID3 algorithm. This decision tree can be 
-used to classify data in a way that is simple for a human to comprehend and the reasoning for making 
+used to classify data in a way that is simple for a human to comprehend, and the reasoning for making 
 decisions is visually described by the graph drawn from the training sample.
 
 From Wikipedia:
 
->In decision tree learning, ID3 (Iterative Dichotomiser 3) is an algorithm invented by Ross Quinlan used to generate a decision tree from a dataset. ID3 is the precursor to the C4.5 algorithm, and is typically used in the machine learning and natural language processing domains.
+> In decision tree learning, ID3 (Iterative Dichotomiser 3) is an algorithm invented by Ross Quinlan used
+> to generate a decision tree from a dataset. ID3 is the precursor to the C4.5 algorithm, and is typically
+> used in the machine learning and natural language processing domains.
 
 ### Implementation
 
 *Problem:* Given data in clean, self describing format, create a decision tree that makes repeated locally 
-optimal decisions on how to divide the data set by an attribute that results in the greatest descrease in 
+optimal decisions on how to divide the data set by an attribute that results in the greatest decrease in 
 entropy (disorder). This is also called information gain.
 
-### Third Party Software
+#### Code Coverage
+
+Code coverage was not a direct goal, but rather the means by which I established confidence of accuracy as I 
+progressed. Final code coverage stands at or about 78%. Tests are especially helpful in validating layered 
+calculations and recursive logic, as they help you fail early and make corrections.
+
+#### Third Party Software
+
+I used no Go dependencies outside the standard library, but the server uses raphael.js and treant.js to 
+draw the trees.
 
 #### Formulas
 
@@ -125,8 +136,11 @@ function convertNode(node) {
 
 #### Challenges and Considerations
 
-- Recursive analysis of data sets requires one to take care to use newly allocated copies of arrays so that modifying one split of the data does not also modify its parent, causing the next split to be invalid.
-- There is a lot of complexity in assessing recursive logic while applying math formulas at each level. To mitigate risks, I used extensive unit tests. These tested only the inputs and outputs expected from pure functions as well as derived data from data sets with previously-known metrics.
+- Recursive analysis of data sets requires one to take care to use newly allocated copies of arrays so that modifying 
+one split of the data does not also modify its parent, causing the next split to be invalid.
+- There is a lot of complexity in assessing recursive logic while applying math formulas at each level. To mitigate 
+risks, I used extensive unit tests. These tested only the inputs and outputs expected from pure functions as well as 
+derived data from data sets with previously-known metrics.
 
 ### Analysis
 
@@ -468,19 +482,25 @@ Wrote out/new-treatment.data.tree.json
 #### Graphical Trees and Server
 
 By running the `Serve.ps1` script, you can see the tree graph for any tree generated via the commandline by
-navigating to http://localhost:3000 While the Go server does not handle timeouts or do extensive error handling, it can run securely behind a reverse proxy such as IIS, Apache, Nginx, or Caddy. If running without a proxy, one should only use it locally or on a secure network.
+navigating to http://localhost:3000 While the Go server does not handle timeouts or do extensive error handling, it 
+can run securely behind a reverse proxy such as IIS, Apache, Nginx, or Caddy. If running without a proxy, one should 
+only use it locally or on a secure network.
 
-A list endpoint reports all the tree files it finds in the out folder so that the frontend can build a dynamic menu. See the first chart example below for the menu. This tree data is located by the server's glob pattern which searches the out directory for tree json files and presents them upon request.
+A list endpoint reports all the tree files it finds in the out folder so that the frontend can build a dynamic menu. 
+See the first chart example below for the menu. This tree data is located by the server's glob pattern which searches 
+the out directory for tree json files and presents them upon request.
 
 #### Contact Lens
 
-Raw parse data is stored in `contact-lenses.data.json` and the analysis data for the contact lens tree is output to `contact-lenses.data.tree.json`.
+Raw parse data is stored in `contact-lenses.data.json` and the analysis data for the contact lens tree is output 
+to `contact-lenses.data.tree.json`.
 
 ![entropy](data/contact-lens.png)
 
 #### Fishing
 
-Raw parse data is stored in `fishing.data.json` and the analysis data for the fishing tree is output to `fishing.data.tree.json`.
+Raw parse data is stored in `fishing.data.json` and the analysis data for the fishing tree is output to 
+`fishing.data.tree.json`.
 
 ![entropy](data/fishing.png)
 
